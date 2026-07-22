@@ -11,5 +11,8 @@ public class BookStoreDb : DbContext
     {
         optionsBuilder.UseSqlServer(@"Server=(localdb\mssqllocaldb);Database=BookstoreDb; Trusted_Connection=True; TrustServerCertificate=True; ");
     }
+
+    // Add entities to track in the database as DbSet below.
+    public DbSet<Book> Books { get; set; }
 }
 
