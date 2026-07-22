@@ -9,7 +9,7 @@ public class BookStoreDb : DbContext
 {
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(@"Server=(localdb\mssqllocaldb);Database=BookstoreDb; Trusted_Connection=True; TrustServerCertificate=True; ");
+        optionsBuilder.UseSqlServer(@"Data Source=ZACHARYKIMB6482;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30");
     }
 
     // Add entities to track in the database as DbSet below.
