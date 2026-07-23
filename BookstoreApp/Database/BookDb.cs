@@ -37,6 +37,25 @@ public static class BookDb
         // Must call SaveChangesAsync to persist the changes to the database.
         await db.SaveChangesAsync();
     }
+    
+    /// <summary>
+    /// The get book by title method.
+    /// Asynchronously retrieves a book from the database by its title.
+    /// </summary>
+    /// <param name="title">
+    /// The title of the book to retrieve.
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The result of the task is the book if found, or null if not found.
+    /// </returns>
+    public static async Task<Book?> GetBookByTitleAsync(string title)
+    {
+        using BookStoreDb db = new();
+
+        // Find the book by its title. Can be null if the book does not exist.
+        Book? book = await db.Books.Where(b => title == b.Title).FirstOrDefaultAsync();
+        return book;
+    }
 
     /// <summary>
     /// The update method.
