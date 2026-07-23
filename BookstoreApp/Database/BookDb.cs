@@ -84,16 +84,16 @@ public static class BookDb
     /// The delete method.
     /// A slightly different overload that takes a Book object instead of an ID.
     /// </summary>
-    /// <param name="b">
+    /// <param name="book">
     /// The book to delete. Cannot be null.
     /// </param>
     /// <returns>
     /// A task that represents the asynchronous operation.
     /// </returns>
-    public static async Task DeleteAsync(Book b)
+    public static async Task DeleteAsync(Book book)
     {
         using BookStoreDb db = new();
-        db.Books.Remove(b);
+        db.Books.Remove(book);
         await db.SaveChangesAsync();
     }
 }
