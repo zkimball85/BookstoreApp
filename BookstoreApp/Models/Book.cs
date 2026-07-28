@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-namespace BookstoreApp;
+namespace BookstoreApp.Models;
 
 /// <summary>
 /// Represents a book in the bookstore.
@@ -35,6 +35,21 @@ public class Book
     /// The optional user facing description of the book.
     /// </summary>
     public string? description { get; set; }
+
+    /// <summary>
+    /// The genres associated with the book.
+    /// </summary>
+    public List<Genre> Genres { get; set; } = [];
+
+    /// <summary>
+    /// Optional primary genre id for quick lookup (denormalized helper).
+    /// </summary>
+    public int? PrimaryGenreId { get; set; }
+
+    /// <summary>
+    /// Navigation property for the primary genre.
+    /// </summary>
+    public Genre? PrimaryGenre { get; set; }
 
     /// <summary>
     /// Returns a string representation of the book, including its title and price.

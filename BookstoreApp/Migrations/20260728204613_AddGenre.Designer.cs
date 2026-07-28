@@ -3,6 +3,7 @@ using BookstoreApp.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookstoreApp.Migrations
 {
     [DbContext(typeof(BookStoreDb))]
-    partial class BookStoreDbModelSnapshot : ModelSnapshot
+    [Migration("20260728204613_AddGenre")]
+    partial class AddGenre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,7 @@ namespace BookstoreApp.Migrations
 
                     b.HasIndex("GenresGenreId");
 
-                    b.ToTable("BookGenre", (string)null);
+                    b.ToTable("BookGenre");
                 });
 
             modelBuilder.Entity("BookstoreApp.Models.Book", b =>
@@ -51,9 +54,6 @@ namespace BookstoreApp.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("PrimaryGenreId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -63,8 +63,6 @@ namespace BookstoreApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BookId");
-
-                    b.HasIndex("PrimaryGenreId");
 
                     b.ToTable("Books");
                 });
@@ -99,16 +97,6 @@ namespace BookstoreApp.Migrations
                         .HasForeignKey("GenresGenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("BookstoreApp.Models.Book", b =>
-                {
-                    b.HasOne("BookstoreApp.Models.Genre", "PrimaryGenre")
-                        .WithMany()
-                        .HasForeignKey("PrimaryGenreId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("PrimaryGenre");
                 });
 #pragma warning restore 612, 618
         }

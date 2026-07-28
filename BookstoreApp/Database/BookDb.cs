@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore; // Add this using directive for Entity Framework Core
+﻿using BookstoreApp.Models;
+using Microsoft.EntityFrameworkCore; // Add this using directive for Entity Framework Core
 
 namespace BookstoreApp.Database;
 
@@ -31,6 +32,21 @@ public static class BookDb
     public static async Task AddAsync(Book book)
     {
         using BookStoreDb db = new();
+
+        // Ensure genres are tracked entities from this context to avoid duplicate inserts.
+        var genreIds = book.Genres?.Select(g => g.GenreId).ToList() ?? new List<int>();
+        book.Genres = new List<Genre>();
+        foreach (var id in genreIds)
+        {
+            var genre = await db.Genres.FindAsync(id);
+            if (genre != null) book.Genres.Add(genre);
+        }
+
+        // If a primary genre id wasn't explicitly set but genres are present, set it from the first genre.
+        if (!book.PrimaryGenreId.HasValue && book.Genres.Any())
+        {
+            book.PrimaryGenreId = book.Genres.First().GenreId;
+        }
 
         db.Books.Add(book);
 
@@ -71,8 +87,40 @@ public static class BookDb
     {
         using BookStoreDb db = new();
 
-        db.Books.Update(book);
+        // Load existing book with genres from the database
+        var existing = await db.Books.Include(b => b.Genres).FirstOrDefaultAsync(b => b.BookId == book.BookId);
+        if (existing == null)
+        {
+            // If not found, treat as add
+            await AddAsync(book);
+            return;
+        }
+
+        // Update scalar properties
+        existing.Title = book.Title;
+        existing.Price = book.Price;
+        existing.ISBN = book.ISBN;
+        existing.description = book.description;
+
+        // Replace genres with tracked instances matching the provided ids
+        existing.Genres.Clear();
+        var genreIds = book.Genres?.Select(g => g.GenreId).ToList() ?? new List<int>();
+        foreach (var id in genreIds)
+        {
+            var genre = await db.Genres.FindAsync(id);
+            if (genre != null) existing.Genres.Add(genre);
+        }
+
+        // Update primary genre id for quick lookup
+        existing.PrimaryGenreId = book.PrimaryGenreId ?? existing.Genres.FirstOrDefault()?.GenreId;
+
         await db.SaveChangesAsync();
+    }
+
+    public static async Task<List<Genre>> GetGenresAsync()
+    {
+        using BookStoreDb db = new();
+        return await db.Genres.OrderBy(g => g.Name).ToListAsync();
     }
     
     /// <summary>
