@@ -37,6 +37,11 @@ public class Book
     public string? description { get; set; }
 
     /// <summary>
+    /// The genres associated with the book.
+    /// </summary>
+    public List<Genre> Genres { get; set; } = [];
+
+    /// <summary>
     /// Returns a string representation of the book, including its title and price.
     /// </summary>
     /// <returns>

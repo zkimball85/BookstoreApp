@@ -21,5 +21,12 @@ public class Genre
     /// </summary>
     [Required]
     public required string Name { get; set; }
+
+    /// <summary>
+    /// Books that contain this genre.
+    /// This is a navigation property that allows
+    /// for easy access to the related books.
+    /// </summary>
+    public List<Book> Books { get; set; } = [];
 }
 
