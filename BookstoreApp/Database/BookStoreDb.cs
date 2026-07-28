@@ -15,5 +15,7 @@ public class BookStoreDb : DbContext
 
     // Add entities to track in the database as DbSet below.
     public DbSet<Book> Books { get; set; }
+
+    public DbSet<Genre> Genres { get; set; }
 }
 
