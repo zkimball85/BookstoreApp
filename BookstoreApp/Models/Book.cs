@@ -42,6 +42,16 @@ public class Book
     public List<Genre> Genres { get; set; } = [];
 
     /// <summary>
+    /// Optional primary genre id for quick lookup (denormalized helper).
+    /// </summary>
+    public int? PrimaryGenreId { get; set; }
+
+    /// <summary>
+    /// Navigation property for the primary genre.
+    /// </summary>
+    public Genre? PrimaryGenre { get; set; }
+
+    /// <summary>
     /// Returns a string representation of the book, including its title and price.
     /// </summary>
     /// <returns>
