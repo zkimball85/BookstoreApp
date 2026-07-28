@@ -101,11 +101,29 @@ namespace BookstoreApp.Forms
             cmbGenre.DataSource = genres;
             cmbGenre.DisplayMember = "Name";
 
-            if (editing != null && editing.Genres != null && editing.Genres.Any())
+            if (editing != null)
             {
-                var first = editing.Genres.First();
-                var match = genres.FirstOrDefault(g => g.GenreId == first.GenreId);
-                if (match != null) cmbGenre.SelectedItem = match;
+                int? selectedGenreId = null;
+
+                // Prefer the first loaded genre if the collection is populated
+                if (editing.Genres != null && editing.Genres.Any())
+                {
+                    selectedGenreId = editing.Genres.First().GenreId;
+                }
+                // Fall back to PrimaryGenreId when Genres is null/empty or not loaded
+                else if (editing.PrimaryGenreId != 0)
+                {
+                    selectedGenreId = editing.PrimaryGenreId;
+                }
+
+                if (selectedGenreId.HasValue)
+                {
+                    var match = genres.FirstOrDefault(g => g.GenreId == selectedGenreId.Value);
+                    if (match != null)
+                    {
+                        cmbGenre.SelectedItem = match;
+                    }
+                }
             }
         }
 
