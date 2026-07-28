@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-namespace BookstoreApp;
+namespace BookstoreApp.Models;
 
 /// <summary>
 /// Represents a book in the bookstore.

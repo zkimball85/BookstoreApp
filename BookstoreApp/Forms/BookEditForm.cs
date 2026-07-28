@@ -1,7 +1,8 @@
+using BookstoreApp.Models;
 using System;
 using System.Windows.Forms;
 
-namespace BookstoreApp
+namespace BookstoreApp.Forms
 {
     public class BookEditForm : Form
     {

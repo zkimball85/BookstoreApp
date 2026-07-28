@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore; // Add this using directive for Entity Framework Core
+﻿using BookstoreApp.Models;
+using Microsoft.EntityFrameworkCore; // Add this using directive for Entity Framework Core
 
 namespace BookstoreApp.Database;
 

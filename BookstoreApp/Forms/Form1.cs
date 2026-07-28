@@ -1,6 +1,9 @@
+using BookstoreApp.Forms;
+using BookstoreApp.Models;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BookstoreApp.Database;
 
 namespace BookstoreApp
 {
