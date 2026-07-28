@@ -13,6 +13,22 @@ public class BookStoreDb : DbContext
         optionsBuilder.UseSqlServer(@"Data Source=ZACHARYKIMB6482; Initial Catalog=BookStoreDb; Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30");
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Explicitly configure many-to-many between Book and Genre to avoid design-time ambiguity.
+        modelBuilder.Entity<Book>()
+            .HasMany(b => b.Genres)
+            .WithMany(g => g.Books)
+            .UsingEntity(j => j.ToTable("BookGenre"));
+
+        // Configure optional primary genre FK
+        modelBuilder.Entity<Book>()
+            .HasOne(b => b.PrimaryGenre)
+            .WithMany()
+            .HasForeignKey(b => b.PrimaryGenreId)
+            .OnDelete(DeleteBehavior.SetNull);
+    }
+
     // Add entities to track in the database as DbSet below.
     public DbSet<Book> Books { get; set; }
 
