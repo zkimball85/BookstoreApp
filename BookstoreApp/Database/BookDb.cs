@@ -14,7 +14,7 @@ public static class BookDb
         using BookStoreDb db = new();
 
         // Retrieve the list of books from the database asynchronously.
-        List<Book> books = await db.Books.OrderBy(b => b.Title).ToListAsync();
+        List<Book> books = await db.Books.OrderBy(static b => b.Title).ToListAsync();
 
         return books;
     }
@@ -46,6 +46,15 @@ public static class BookDb
         if (!book.PrimaryGenreId.HasValue && book.Genres.Any())
         {
             book.PrimaryGenreId = book.Genres.First().GenreId;
+        }
+
+        if (book.BookAuthorId != 0)
+        {
+            var author = await db.Authors.FindAsync(book.BookAuthorId);
+            if (author != null)
+            {
+                book.BookAuthor = author;
+            }
         }
 
         db.Books.Add(book);
@@ -101,6 +110,7 @@ public static class BookDb
         existing.Price = book.Price;
         existing.ISBN = book.ISBN;
         existing.description = book.description;
+        existing.BookAuthorId = book.BookAuthorId;
 
         // Replace genres with tracked instances matching the provided ids
         existing.Genres.Clear();
@@ -114,6 +124,11 @@ public static class BookDb
         // Update primary genre id for quick lookup
         existing.PrimaryGenreId = book.PrimaryGenreId ?? existing.Genres.FirstOrDefault()?.GenreId;
 
+        if (book.BookAuthorId != 0)
+        {
+            existing.BookAuthor = await db.Authors.FindAsync(book.BookAuthorId);
+        }
+
         await db.SaveChangesAsync();
     }
 
@@ -121,6 +136,44 @@ public static class BookDb
     {
         using BookStoreDb db = new();
         return await db.Genres.OrderBy(g => g.Name).ToListAsync();
+    }
+
+    public static async Task<List<Author>> GetAuthorsAsync()
+    {
+        using BookStoreDb db = new();
+        return await db.Authors.OrderBy(a => a.Name).ToListAsync();
+    }
+
+    public static async Task AddAuthorAsync(Author author)
+    {
+        using BookStoreDb db = new();
+        db.Authors.Add(author);
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task UpdateAuthorAsync(Author author)
+    {
+        using BookStoreDb db = new();
+        var existing = await db.Authors.FindAsync(author.Id);
+        if (existing == null)
+        {
+            await AddAuthorAsync(author);
+            return;
+        }
+
+        existing.Name = author.Name;
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task DeleteAuthorAsync(int authorId)
+    {
+        using BookStoreDb db = new();
+        var author = await db.Authors.FindAsync(authorId);
+        if (author != null)
+        {
+            db.Authors.Remove(author);
+            await db.SaveChangesAsync();
+        }
     }
     
     /// <summary>
