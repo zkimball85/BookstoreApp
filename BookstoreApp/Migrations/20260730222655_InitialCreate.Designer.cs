@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookstoreApp.Migrations
 {
     [DbContext(typeof(BookStoreDb))]
-    [Migration("20260728224803_PrimaryGenreId")]
-    partial class PrimaryGenreId
+    [Migration("20260730222655_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,23 @@ namespace BookstoreApp.Migrations
                     b.ToTable("BookGenre", (string)null);
                 });
 
+            modelBuilder.Entity("BookstoreApp.Models.Author", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Authors");
+                });
+
             modelBuilder.Entity("BookstoreApp.Models.Book", b =>
                 {
                     b.Property<int>("BookId")
@@ -46,6 +63,9 @@ namespace BookstoreApp.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
+
+                    b.Property<int>("BookAuthorId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ISBN")
                         .IsRequired()
@@ -66,6 +86,8 @@ namespace BookstoreApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BookId");
+
+                    b.HasIndex("BookAuthorId");
 
                     b.HasIndex("PrimaryGenreId");
 
@@ -106,12 +128,25 @@ namespace BookstoreApp.Migrations
 
             modelBuilder.Entity("BookstoreApp.Models.Book", b =>
                 {
+                    b.HasOne("BookstoreApp.Models.Author", "BookAuthor")
+                        .WithMany("Books")
+                        .HasForeignKey("BookAuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BookstoreApp.Models.Genre", "PrimaryGenre")
                         .WithMany()
                         .HasForeignKey("PrimaryGenreId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.Navigation("BookAuthor");
+
                     b.Navigation("PrimaryGenre");
+                });
+
+            modelBuilder.Entity("BookstoreApp.Models.Author", b =>
+                {
+                    b.Navigation("Books");
                 });
 #pragma warning restore 612, 618
         }

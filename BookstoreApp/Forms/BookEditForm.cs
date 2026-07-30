@@ -1,5 +1,6 @@
 using BookstoreApp.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace BookstoreApp.Forms
         private NumericUpDown nudPrice;
         private TextBox txtDescription;
         private ComboBox cmbGenre;
+        private ComboBox cmbAuthor;
         private Button btnSave;
         private Button btnCancel;
 
@@ -29,7 +31,8 @@ namespace BookstoreApp.Forms
             {
                 txtTitle.Text = editing.Title;
                 nudPrice.Value = editing.Price;
-                txtDescription.Text = editing.description;
+                txtDescription.Text = editing.description ?? string.Empty;
+                txtISBN.Text = editing.ISBN;
                 Text = "Edit Book";
             }
             else
@@ -37,7 +40,7 @@ namespace BookstoreApp.Forms
                 Text = "Add Book";
             }
 
-            _ = LoadGenresAsync();
+            
         }
 
         private void InitializeComponent()
@@ -46,6 +49,7 @@ namespace BookstoreApp.Forms
             nudPrice = new NumericUpDown();
             txtDescription = new TextBox();
             cmbGenre = new ComboBox();
+            cmbAuthor = new ComboBox();
             btnSave = new Button();
             btnCancel = new Button();
 
@@ -73,33 +77,47 @@ namespace BookstoreApp.Forms
             cmbGenre.Size = new System.Drawing.Size(360, 23);
             cmbGenre.DropDownStyle = ComboBoxStyle.DropDownList;
 
+            cmbAuthor.Location = new System.Drawing.Point(12, 228);
+            cmbAuthor.Size = new System.Drawing.Size(360, 23);
+            cmbAuthor.DropDownStyle = ComboBoxStyle.DropDownList;
+
             btnSave.Text = "Save";
-            btnSave.Location = new System.Drawing.Point(12, 236);
+            btnSave.Location = new System.Drawing.Point(12, 268);
             btnSave.Click += btnSave_Click;
 
             btnCancel.Text = "Cancel";
-            btnCancel.Location = new System.Drawing.Point(100, 236);
-            btnCancel.Click += (s, e) => DialogResult = DialogResult.Cancel;
+            btnCancel.Location = new System.Drawing.Point(100, 268);
+            btnCancel.DialogResult = DialogResult.Cancel;
+            
 
-            ClientSize = new System.Drawing.Size(400, 300);
+            ClientSize = new System.Drawing.Size(400, 330);
             Controls.Add(txtTitle);
             Controls.Add(txtISBN);
             Controls.Add(nudPrice);
             Controls.Add(txtDescription);
             Controls.Add(cmbGenre);
+            Controls.Add(cmbAuthor);
             Controls.Add(btnSave);
             Controls.Add(btnCancel);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
             AcceptButton = btnSave;
             CancelButton = btnCancel;
+
+            Load += async (s,e) => await LoadLookupsAsync();
         }
 
-        private async Task LoadGenresAsync()
+        private async Task LoadLookupsAsync()
         {
             var genres = await Database.BookDb.GetGenresAsync();
             cmbGenre.DataSource = genres;
             cmbGenre.DisplayMember = "Name";
+            cmbGenre.ValueMember = "GenreId"; // Add this
+
+            var authors = await Database.BookDb.GetAuthorsAsync();
+            cmbAuthor.DataSource = authors;
+            cmbAuthor.DisplayMember = "Name";
+            cmbAuthor.ValueMember = "Id";
 
             if (editing != null)
             {
@@ -111,7 +129,7 @@ namespace BookstoreApp.Forms
                     selectedGenreId = editing.Genres.First().GenreId;
                 }
                 // Fall back to PrimaryGenreId when Genres is null/empty or not loaded
-                else if (editing.PrimaryGenreId != 0)
+                else if (editing.PrimaryGenreId.HasValue)
                 {
                     selectedGenreId = editing.PrimaryGenreId;
                 }
@@ -124,37 +142,61 @@ namespace BookstoreApp.Forms
                         cmbGenre.SelectedItem = match;
                     }
                 }
+
+                if (editing.BookAuthorId != 0)
+                {
+                    var selectedAuthor = authors.FirstOrDefault(a => a.Id == editing.BookAuthorId);
+                    if (selectedAuthor != null)
+                    {
+                        cmbAuthor.SelectedItem = selectedAuthor;
+                    }
+                }
             }
         }
 
         private async void btnSave_Click(object? sender, EventArgs e)
         {
-            string title = txtTitle.Text?.Trim() ?? string.Empty;
-            if (string.IsNullOrEmpty(title))
+            string title = txtTitle.Text.Trim();
+            if (string.IsNullOrWhiteSpace(title))
             {
                 MessageBox.Show(this, "Title is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            string isbnRaw = txtISBN.Text?.Trim() ?? string.Empty;
-            // Enforce digits only, 13 characters
+            string isbnRaw = txtISBN.Text.Trim();
             if (!Regex.IsMatch(isbnRaw, "^\\d{13}$"))
             {
                 MessageBox.Show(this, "ISBN is required and must be exactly 13 digits (numbers only).", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            if (cmbAuthor.SelectedItem is not Author selectedAuthor)
+            {
+                MessageBox.Show(this, "Please select an author.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             decimal price = nudPrice.Value;
-            string? desc = txtDescription.Text?.Trim();
+            string? desc = txtDescription.Text.Trim();
 
             if (editing == null)
             {
-                var book = new Book { Title = title, Price = price, description = desc, ISBN = isbnRaw };
+                Book book = new()
+                {
+                    Title = title,
+                    Price = price,
+                    description = desc,
+                    ISBN = isbnRaw,
+                    BookAuthorId = selectedAuthor.Id,
+                    BookAuthor = selectedAuthor
+                };
+
                 if (cmbGenre.SelectedItem is Genre sel)
                 {
                     book.Genres = new List<Genre> { sel };
                     book.PrimaryGenreId = sel.GenreId;
                 }
+
                 await Database.BookDb.AddAsync(book);
             }
             else
@@ -163,6 +205,9 @@ namespace BookstoreApp.Forms
                 editing.Price = price;
                 editing.description = desc;
                 editing.ISBN = isbnRaw;
+                editing.BookAuthorId = selectedAuthor.Id;
+                editing.BookAuthor = selectedAuthor;
+
                 if (cmbGenre.SelectedItem is Genre sel)
                 {
                     editing.Genres = new List<Genre> { sel };
@@ -178,6 +223,7 @@ namespace BookstoreApp.Forms
             }
 
             DialogResult = DialogResult.OK;
+            Close();
         }
     }
 }

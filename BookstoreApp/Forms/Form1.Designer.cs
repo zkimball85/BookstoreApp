@@ -33,50 +33,82 @@
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            lstBooks = new ListBox();
+            btnAddUpdate = new Button();
+            btnNew = new Button();
+            btnDelete = new Button();
+            btnManageAuthors = new Button();
+            SuspendLayout();
+            // 
+            // lstBooks
+            // 
+            lstBooks.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            lstBooks.Location = new Point(12, 12);
+            lstBooks.Name = "lstBooks";
+            lstBooks.Size = new Size(560, 404);
+            lstBooks.TabIndex = 0;
+            // 
+            // btnAddUpdate
+            // 
+            btnAddUpdate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnAddUpdate.Location = new Point(590, 62);
+            btnAddUpdate.Name = "btnAddUpdate";
+            btnAddUpdate.Size = new Size(180, 40);
+            btnAddUpdate.TabIndex = 2;
+            btnAddUpdate.Text = "Add / Update";
+            btnAddUpdate.Click += btnAddUpdate_Click;
+            // 
+            // btnNew
+            // 
+            btnNew.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnNew.Location = new Point(590, 12);
+            btnNew.Name = "btnNew";
+            btnNew.Size = new Size(180, 40);
+            btnNew.TabIndex = 1;
+            btnNew.Text = "New";
+            btnNew.Click += btnNew_Click;
+            // 
+            // btnDelete
+            // 
+            btnDelete.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnDelete.BackColor = Color.Red;
+            btnDelete.Location = new Point(590, 112);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(180, 40);
+            btnDelete.TabIndex = 3;
+            btnDelete.Text = "Delete";
+            btnDelete.UseVisualStyleBackColor = false;
+            btnDelete.Click += btnDelete_Click;
+            // 
+            // btnManageAuthors
+            // 
+            btnManageAuthors.BackColor = Color.Yellow;
+            btnManageAuthors.Location = new Point(590, 167);
+            btnManageAuthors.Name = "btnManageAuthors";
+            btnManageAuthors.Size = new Size(180, 39);
+            btnManageAuthors.TabIndex = 4;
+            btnManageAuthors.Text = "Manage Authors";
+            btnManageAuthors.UseVisualStyleBackColor = false;
+            btnManageAuthors.Click += btnManageAuthors_Click;
+            // 
+            // Form1
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Text = "Bookstore";
-
-            lstBooks = new System.Windows.Forms.ListBox();
-            btnAddUpdate = new System.Windows.Forms.Button();
-            btnNew = new System.Windows.Forms.Button();
-            btnDelete = new System.Windows.Forms.Button();
-
-            // lstBooks
-            lstBooks.Location = new Point(12, 12);
-            lstBooks.Size = new Size(560, 420);
-            lstBooks.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-
-            // btnNew
-            btnNew.Text = "New";
-            btnNew.Location = new Point(590, 12);
-            btnNew.Size = new Size(180, 40);
-            btnNew.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnNew.Click += btnNew_Click;
-
-            // btnAddUpdate
-            btnAddUpdate.Text = "Add / Update";
-            btnAddUpdate.Location = new Point(590, 62);
-            btnAddUpdate.Size = new Size(180, 40);
-            btnAddUpdate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAddUpdate.Click += btnAddUpdate_Click;
-
-            // btnDelete
-            btnDelete.Text = "Delete";
-            btnDelete.Location = new Point(590, 112);
-            btnDelete.Size = new Size(180, 40);
-            btnDelete.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnDelete.Click += btnDelete_Click;
-
+            Controls.Add(btnManageAuthors);
             Controls.Add(lstBooks);
             Controls.Add(btnNew);
             Controls.Add(btnAddUpdate);
             Controls.Add(btnDelete);
-
+            Name = "Form1";
+            Text = "Bookstore";
             Load += Form1_Load;
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private Button btnManageAuthors;
     }
 }
