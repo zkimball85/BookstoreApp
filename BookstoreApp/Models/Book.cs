@@ -42,6 +42,16 @@ public class Book
     public List<Genre> Genres { get; set; } = [];
 
     /// <summary>
+    /// The foreign key for the author of the book.
+    /// </summary>
+    public int BookAuthorId { get; set; }
+
+    /// <summary>
+    /// Navigation property for the author.
+    /// </summary>
+    public Author? BookAuthor { get; set; }
+
+    /// <summary>
     /// Optional primary genre id for quick lookup (denormalized helper).
     /// </summary>
     public int? PrimaryGenreId { get; set; }
