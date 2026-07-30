@@ -66,5 +66,11 @@ namespace BookstoreApp
             await LoadBooksAsync();
             MessageBox.Show(this, $"'{selected.Title}' deleted.", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private void btnManageAuthors_Click(object? sender, EventArgs e)
+        {
+            using var form = new AuthorManagementForm();
+            form.ShowDialog(this);
+        }
     }
 }
