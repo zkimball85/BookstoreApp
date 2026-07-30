@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookstoreApp.Migrations
 {
     [DbContext(typeof(BookStoreDb))]
-    [Migration("20260728214319_GenreSeedData")]
-    partial class GenreSeedData
+    [Migration("20260730223648_AddedBook")]
+    partial class AddedBook
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,24 @@ namespace BookstoreApp.Migrations
 
                     b.HasIndex("GenresGenreId");
 
-                    b.ToTable("BookGenre");
+                    b.ToTable("BookGenre", (string)null);
+                });
+
+            modelBuilder.Entity("BookstoreApp.Models.Author", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Authors");
                 });
 
             modelBuilder.Entity("BookstoreApp.Models.Book", b =>
@@ -47,12 +64,18 @@ namespace BookstoreApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
 
+                    b.Property<int>("BookAuthorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ISBN")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("PrimaryGenreId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -63,6 +86,10 @@ namespace BookstoreApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BookId");
+
+                    b.HasIndex("BookAuthorId");
+
+                    b.HasIndex("PrimaryGenreId");
 
                     b.ToTable("Books");
                 });
@@ -82,58 +109,6 @@ namespace BookstoreApp.Migrations
                     b.HasKey("GenreId");
 
                     b.ToTable("Genres");
-
-                    b.HasData(
-                        new
-                        {
-                            GenreId = 1,
-                            Name = "Fiction"
-                        },
-                        new
-                        {
-                            GenreId = 2,
-                            Name = "Non-Fiction"
-                        },
-                        new
-                        {
-                            GenreId = 3,
-                            Name = "Science Fiction"
-                        },
-                        new
-                        {
-                            GenreId = 4,
-                            Name = "Fantasy"
-                        },
-                        new
-                        {
-                            GenreId = 5,
-                            Name = "Mystery"
-                        },
-                        new
-                        {
-                            GenreId = 6,
-                            Name = "Biography"
-                        },
-                        new
-                        {
-                            GenreId = 7,
-                            Name = "Romance"
-                        },
-                        new
-                        {
-                            GenreId = 8,
-                            Name = "Historical"
-                        },
-                        new
-                        {
-                            GenreId = 9,
-                            Name = "Horror"
-                        },
-                        new
-                        {
-                            GenreId = 10,
-                            Name = "Young Adult"
-                        });
                 });
 
             modelBuilder.Entity("BookGenre", b =>
@@ -149,6 +124,29 @@ namespace BookstoreApp.Migrations
                         .HasForeignKey("GenresGenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BookstoreApp.Models.Book", b =>
+                {
+                    b.HasOne("BookstoreApp.Models.Author", "BookAuthor")
+                        .WithMany("Books")
+                        .HasForeignKey("BookAuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookstoreApp.Models.Genre", "PrimaryGenre")
+                        .WithMany()
+                        .HasForeignKey("PrimaryGenreId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("BookAuthor");
+
+                    b.Navigation("PrimaryGenre");
+                });
+
+            modelBuilder.Entity("BookstoreApp.Models.Author", b =>
+                {
+                    b.Navigation("Books");
                 });
 #pragma warning restore 612, 618
         }
